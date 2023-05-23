@@ -1,5 +1,7 @@
 import { useMemo, useContext } from "react";
 import { Context } from "../context";
+import FireStore from "../handlers/firestore";
+const { writeDoc } = FireStore;
 
 const Preview = () => {
   const { state } = useContext(Context);
@@ -20,24 +22,26 @@ const Preview = () => {
 
 const UploadForm = () => {
   const { state, dispatch} = useContext(Context);
+  const {isCollapsed : isVisible, inputs } = state;
 
-  const handleOnChange = (e) => dispatch({ type: 'setInputs', payload: { value: e}})
+  const handleOnChange = (e) => dispatch({ type: 'setInputs', payload: { value: e}});
   const handleOnSubmit = (e) => {
     e.preventDefault();
+    writeDoc(inputs, "stocks").then(console.log);
     dispatch({ type: 'setItem'});
     dispatch({ type: 'collapse', payload: { bool: false}});
     dispatch({ type: 'setInputs', payload: { value: e}})
   }
 
   const isDisabled = useMemo(() => {
-    return !!Object.values(state.inputs).some(input => !input)
-  }, [state.inputs]);
+    return !!Object.values(inputs).some(input => !input)
+  }, [inputs]);
 
   return (
-    state.isCollapsed && <>
+    isVisible && <>
       <p className="display-6 text-center mb-3">Upload Stock Image</p>
       <div className="mb-5 d-flex align-items-center justify-content-center">
-        <Preview {...state.inputs} />
+        <Preview {...inputs} />
         <form className="mb-2" style={{ textAlign: "left" }} onSubmit={handleOnSubmit}>
           <div className="mb-3">
             <input

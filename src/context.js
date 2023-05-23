@@ -1,4 +1,7 @@
 import { createContext, useReducer } from "react";
+import FireStore from "./handlers/firestore";
+
+const { readDocs } = FireStore
 
 export const Context = createContext();
 
@@ -14,7 +17,7 @@ const initialState = {
 const handleOnChange = (state, e) => {
   if (e.target.name === 'file') {
     try {
-      return { ...state.inputs, title: e.target.value, file: e.target.files[0], path: URL.createObjectURL(e.target.files[0]) }
+      return { ...state.inputs, file: e.target.files[0], path: URL.createObjectURL(e.target.files[0]) }
     } catch (error) {
       console.error(error)
     }
@@ -28,7 +31,14 @@ function reducer(state, action) {
     case 'setItem':
       return {
         ...state,
-        items: [state.inputs, ...state.items]
+        items: [state.inputs, ...state.items],
+        count: state.items.length + 1,
+        inputs: {title: null, file: null, path: null}
+      }
+    case 'setItems':
+      return {
+        ...state,
+        items: action.payload.items,
       }
     case 'setInputs':
       return {
@@ -46,8 +56,11 @@ function reducer(state, action) {
 
 const Provider = ({ children}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-
-    return <Context.Provider value={{state, dispatch}}>{children}</Context.Provider>
+    const read = async () => {
+      const items = await readDocs("stocks");
+      dispatch({type: "setItems", payload: { items }})
+    }
+    return <Context.Provider value={{state, dispatch, read }}>{children}</Context.Provider>
 }
 
 export default Provider
