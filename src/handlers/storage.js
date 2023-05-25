@@ -19,7 +19,6 @@ const Storage = {
             try {
                 const mediaRef = ref(storage, media.path);
                 const fileUrl = await getDownloadURL(mediaRef);
-                console.log(fileUrl);
                 resolve(fileUrl)
             } catch (e) {
                 console.error(e);
