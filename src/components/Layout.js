@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Context } from "../context";
+import { Context } from "../context/fireStoreContext";
 import Navbar from "./Navbar";
 import UploadForm from "./UploadForm";
 
